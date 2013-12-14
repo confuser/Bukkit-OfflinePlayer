@@ -1,0 +1,10 @@
+main: me.confuser.offlineplayer.OfflinePlayerPlugin
+name: OfflinePlayer
+version: 1.0
+website: http://www.frostcast.net
+authors: [confuserr]
+softdepend: [Essentials]
+commands:
+  offline:
+    description: "OfflinePlayer base command"
+    usage: "/offline <subCommand> <args>"
