@@ -88,7 +88,7 @@ public class CommandHandler implements CommandExecutor {
 		p.sendMessage(ChatColor.GOLD + "/" + commandName + " <command> <args>");
 		p.sendMessage(ChatColor.GOLD + "Commands are as follows:");
 		for (SubCommand v : commands.values()) {
-			if (p.hasPermission(v.permission()) && v.help(p) != null)
+			if (p.hasPermission(plugin.getPermissionBase() + "." + v.permission()) && v.help(p) != null)
 				p.sendMessage(ChatColor.AQUA + v.help(p));
 		}
 	}
