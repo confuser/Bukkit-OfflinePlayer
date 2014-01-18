@@ -1,6 +1,6 @@
 main: me.confuser.offlineplayer.OfflinePlayerPlugin
 name: OfflinePlayer
-version: 1.0
+version: ${project.version}
 website: http://www.frostcast.net
 authors: [confuserr]
 softdepend: [Essentials]
