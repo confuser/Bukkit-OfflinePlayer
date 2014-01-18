@@ -21,6 +21,7 @@ import com.comphenix.attribute.NbtFactory.NbtList;
 
 public class InventoryEvents implements Listener {
 	public static HashMap<String, String> openedInvs = new HashMap<String, String>();
+	public static HashMap<String, String> openedEnderInvs = new HashMap<String, String>();
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void serverTransfer(ServerCommandEvent event) {
@@ -35,12 +36,31 @@ public class InventoryEvents implements Listener {
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event) {
 		String playerName = event.getPlayer().getName();
+		boolean isPlayerInv = false;
+		boolean isEnderInv = false;
+		String nbtTag = "";
 
-		if (openedInvs.get(playerName) == null)
+		if (openedInvs.get(playerName) != null) {
+			isPlayerInv = true;
+			nbtTag = "Inventory";
+		} else if (openedEnderInvs.get(playerName) != null) {
+			isEnderInv = true;
+			nbtTag = "EnderItems";
+		}
+
+		if (!isPlayerInv && !isEnderInv)
 			return;
+
+		String playerInvName = null;
+
+		if (isPlayerInv)
+			playerInvName = openedInvs.remove(playerName);
+		else if (isEnderInv)
+			playerInvName = openedEnderInvs.remove(playerName);
+
 		OfflinePlayerFile file = null;
 		try {
-			file = new OfflinePlayerFile((CommandSender) event.getPlayer(), openedInvs.remove(playerName));
+			file = new OfflinePlayerFile((CommandSender) event.getPlayer(), playerInvName);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
@@ -59,7 +79,7 @@ public class InventoryEvents implements Listener {
 			e.printStackTrace();
 		}
 		Class<?> inventoryClass = Util.getCraftClass("PlayerInventory");
-		NbtList nbtInv = file.getNbt().getList("Inventory", false);
+		NbtList nbtInv = file.getNbt().getList(nbtTag, false);
 		Method toNbtMethod = Util.getMethod(inventoryClass, "a", new Class<?>[] { nbtInv.getHandle().getClass() });
 		nbtInv.clear();
 		try {
@@ -68,8 +88,7 @@ public class InventoryEvents implements Listener {
 			e.printStackTrace();
 		}
 
-		file.getNbt().putPath("Inventory", nbtInv);
+		file.getNbt().putPath(nbtTag, nbtInv);
 		file.save();
 	}
-
 }

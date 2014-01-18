@@ -25,6 +25,7 @@ public class CommandHandler implements CommandExecutor {
 		commands.put("gm", new GameModeCommand());
 		commands.put("inv", new InventoryCommand());
 		commands.put("location", new LocationCommand());
+		commands.put("echest", new EnderChestCommand());
 
 		if (Bukkit.getServer().getPluginManager().getPlugin("Essentials") != null)
 			commands.put("socialspy", new SocialSpyCommand());
