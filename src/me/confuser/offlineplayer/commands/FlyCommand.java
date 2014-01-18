@@ -49,6 +49,9 @@ public class FlyCommand implements SubCommand {
 					e.printStackTrace();
 					return;
 				}
+				
+				if (file.getNbt() == null)
+					return;
 
 				file.getNbt().putPath("abilities.mayfly", flyMode);
 				file.getNbt().putPath("abilities.flying", flyMode);

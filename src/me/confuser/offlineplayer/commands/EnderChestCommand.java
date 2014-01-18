@@ -47,6 +47,9 @@ public class EnderChestCommand implements SubCommand {
 					e.printStackTrace();
 					return;
 				}
+				
+				if (file.getNbt() == null)
+					return;
 
 				Class<?> inventoryClass = Util.getCraftClass("PlayerInventory");
 				Object inventory = null;

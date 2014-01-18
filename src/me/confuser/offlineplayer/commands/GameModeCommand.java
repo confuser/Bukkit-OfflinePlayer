@@ -49,6 +49,9 @@ public class GameModeCommand implements SubCommand {
 					e.printStackTrace();
 					return;
 				}
+				
+				if (file.getNbt() == null)
+					return;
 
 				if (file.getNbt().getInteger("playerGameType", 0) == gameMode) {
 					sender.sendMessage(ChatColor.RED + "The game mode of " + playerName + " is already set to " + gameMode + ".");

@@ -59,6 +59,9 @@ public class LocationCommand implements SubCommand {
 					return;
 				}
 				
+				if (file.getNbt() == null)
+					return;
+				
 				// Handle x y z
 				NbtList pos = file.getNbt().getList("Pos", false);
 				
