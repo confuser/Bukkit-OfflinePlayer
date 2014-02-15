@@ -1,15 +1,11 @@
 package me.confuser.offlineplayer.commands;
 
-import java.io.IOException;
-
 import me.confuser.offlineplayer.OfflinePlayerFile;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-
-import com.comphenix.attribute.NbtFactory.NbtList;
 
 public class LocationCommand implements SubCommand {
 
@@ -46,37 +42,15 @@ public class LocationCommand implements SubCommand {
 
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
 
-			@SuppressWarnings("deprecation")
 			@Override
 			public void run() {
 
-				OfflinePlayerFile file = null;
-				try {
-					file = new OfflinePlayerFile(sender, playerName);
-				} catch (IOException e) {
-					sender.sendMessage(ChatColor.RED + "An error occured, please check the console.");
-					e.printStackTrace();
-					return;
-				}
-				
-				if (file.getNbt() == null)
-					return;
-				
-				// Handle x y z
-				NbtList pos = file.getNbt().getList("Pos", false);
-				
-				pos.set(0, x);
-				pos.set(1, y);
-				pos.set(2, z);
-				
-				file.getNbt().putPath("Pos", pos);
-				
-				// Handle world
-				file.getNbt().putPath("WorldUUIDMost", world.getUID().getMostSignificantBits());
-			    file.getNbt().putPath("WorldUUIDLeast", world.getUID().getLeastSignificantBits());
-			    file.getNbt().put("Dimension", world.getEnvironment().getId());
+				OfflinePlayerFile player = new OfflinePlayerFile(sender, playerName);
 
-				file.save();
+				if (player.getNbt() == null)
+					return;
+
+				player.setLocation(world, x, y, z);
 
 				sender.sendMessage(ChatColor.GREEN + playerName + " location set to " + x + ", " + y + ", " + z + " in " + worldName + ".");
 			}

@@ -1,7 +1,5 @@
 package me.confuser.offlineplayer.commands;
 
-import java.io.IOException;
-
 import me.confuser.offlineplayer.OfflinePlayerFile;
 
 import org.bukkit.Bukkit;
@@ -41,23 +39,13 @@ public class FlyCommand implements SubCommand {
 			@Override
 			public void run() {
 
-				OfflinePlayerFile file = null;
-				try {
-					file = new OfflinePlayerFile(sender, playerName);
-				} catch (IOException e) {
-					sender.sendMessage(ChatColor.RED + "An error occured, please check the console.");
-					e.printStackTrace();
-					return;
-				}
-				
-				if (file.getNbt() == null)
+				OfflinePlayerFile player = new OfflinePlayerFile(sender, playerName);
+
+				if (player.getNbt() == null)
 					return;
 
-				file.getNbt().putPath("abilities.mayfly", flyMode);
-				file.getNbt().putPath("abilities.flying", flyMode);
+				player.setFlying(flyMode);
 
-				file.save();
-				
 				String status = "enabled";
 
 				if (flyMode == 0)

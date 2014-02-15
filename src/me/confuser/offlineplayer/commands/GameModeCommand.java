@@ -1,7 +1,5 @@
 package me.confuser.offlineplayer.commands;
 
-import java.io.IOException;
-
 import me.confuser.offlineplayer.OfflinePlayerFile;
 
 import org.bukkit.Bukkit;
@@ -41,26 +39,12 @@ public class GameModeCommand implements SubCommand {
 			@Override
 			public void run() {
 
-				OfflinePlayerFile file = null;
-				try {
-					file = new OfflinePlayerFile(sender, playerName);
-				} catch (IOException e) {
-					sender.sendMessage(ChatColor.RED + "An error occured, please check the console.");
-					e.printStackTrace();
-					return;
-				}
+				OfflinePlayerFile player = new OfflinePlayerFile(sender, playerName);
 				
-				if (file.getNbt() == null)
+				if (player.getNbt() == null)
 					return;
 
-				if (file.getNbt().getInteger("playerGameType", 0) == gameMode) {
-					sender.sendMessage(ChatColor.RED + "The game mode of " + playerName + " is already set to " + gameMode + ".");
-					return;
-				}
-
-				file.getNbt().putPath("playerGameType", gameMode);
-
-				file.save();
+				player.setGameMode(gameMode);
 
 				sender.sendMessage(ChatColor.GREEN + playerName + " game mode set to " + gameMode + ".");
 			}
