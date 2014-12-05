@@ -1,6 +1,8 @@
 package me.confuser.offlineplayer.commands;
 
 import me.confuser.offlineplayer.OfflinePlayerFile;
+import net.frostcast.playeridapi.PlayerIdAPI;
+import net.frostcast.playeridapi.storage.CachedPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -14,8 +16,14 @@ public class GameModeCommand implements SubCommand {
 			return false;
 
 		final String playerName = args[0];
+		final CachedPlayer cachedPlayer = PlayerIdAPI.getByCurrentName(playerName);
+		
+		if (cachedPlayer == null) {
+			sender.sendMessage(ChatColor.RED + playerName + " not found.");
+			return true;
+		}
 
-		if (Bukkit.getPlayerExact(playerName) != null) {
+		if (Bukkit.getPlayer(cachedPlayer.getUuid()) != null) {
 			sender.sendMessage(ChatColor.RED + playerName + " is online!");
 			return true;
 		}
@@ -39,14 +47,14 @@ public class GameModeCommand implements SubCommand {
 			@Override
 			public void run() {
 
-				OfflinePlayerFile player = new OfflinePlayerFile(sender, playerName);
+				OfflinePlayerFile player = new OfflinePlayerFile(sender, cachedPlayer.getUuid());
 				
 				if (player.getNbt() == null)
 					return;
 
 				player.setGameMode(gameMode);
 
-				sender.sendMessage(ChatColor.GREEN + playerName + " game mode set to " + gameMode + ".");
+				sender.sendMessage(ChatColor.GREEN + cachedPlayer.getCurrentName() + " game mode set to " + gameMode + ".");
 			}
 
 		});

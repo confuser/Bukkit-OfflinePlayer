@@ -1,6 +1,8 @@
 package me.confuser.offlineplayer.commands;
 
 import me.confuser.offlineplayer.OfflinePlayerFile;
+import net.frostcast.playeridapi.PlayerIdAPI;
+import net.frostcast.playeridapi.storage.CachedPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -14,8 +16,14 @@ public class FlyCommand implements SubCommand {
 			return false;
 
 		final String playerName = args[0];
+		final CachedPlayer cachedPlayer = PlayerIdAPI.getByCurrentName(playerName);
+		
+		if (cachedPlayer == null) {
+			sender.sendMessage(ChatColor.RED + playerName + " not found.");
+			return true;
+		}
 
-		if (Bukkit.getPlayerExact(playerName) != null) {
+		if (Bukkit.getPlayer(cachedPlayer.getUuid()) != null) {
 			sender.sendMessage(ChatColor.RED + playerName + " is online!");
 			return true;
 		}
@@ -39,7 +47,7 @@ public class FlyCommand implements SubCommand {
 			@Override
 			public void run() {
 
-				OfflinePlayerFile player = new OfflinePlayerFile(sender, playerName);
+				OfflinePlayerFile player = new OfflinePlayerFile(sender, cachedPlayer.getUuid());
 
 				if (player.getNbt() == null)
 					return;
@@ -51,7 +59,7 @@ public class FlyCommand implements SubCommand {
 				if (flyMode == 0)
 					status = "disabled";
 
-				sender.sendMessage(ChatColor.GREEN + playerName + " flight " + status + ".");
+				sender.sendMessage(ChatColor.GREEN + cachedPlayer.getCurrentName() + " flight " + status + ".");
 			}
 
 		});

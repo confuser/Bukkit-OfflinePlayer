@@ -2,6 +2,9 @@ package me.confuser.offlineplayer.commands;
 
 import me.confuser.offlineplayer.OfflinePlayerFile;
 import me.confuser.offlineplayer.listeners.InventoryEvents;
+import net.frostcast.playeridapi.PlayerIdAPI;
+import net.frostcast.playeridapi.storage.CachedPlayer;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -21,23 +24,29 @@ public class EnderChestCommand implements SubCommand {
 		}
 
 		final String playerName = args[0];
-
-		if (Bukkit.getPlayerExact(playerName) != null) {
-			sender.sendMessage(ChatColor.RED + playerName + " is online!");
+		final CachedPlayer cachedPlayer = PlayerIdAPI.getByCurrentName(playerName);
+		
+		if (cachedPlayer == null) {
+			sender.sendMessage(ChatColor.RED + playerName + " not found.");
 			return true;
 		}
 
+		if (Bukkit.getPlayer(cachedPlayer.getUuid()) != null) {
+			sender.sendMessage(ChatColor.RED + playerName + " is online!");
+			return true;
+		}
+		
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
 
 			@Override
 			public void run() {
 
-				OfflinePlayerFile player = new OfflinePlayerFile(sender, playerName);
+				OfflinePlayerFile player = new OfflinePlayerFile(sender, cachedPlayer.getUuid());
 
 				if (player.getNbt() == null)
 					return;
 
-				final Inventory playerInventory = player.getEnderChest();
+				final Inventory playerInventory = player.getEnderChest((Player) sender);
 
 				plugin.getServer().getScheduler().runTask(plugin, new Runnable() {
 
@@ -45,7 +54,7 @@ public class EnderChestCommand implements SubCommand {
 					public void run() {
 						((Player) sender).openInventory(playerInventory);
 
-						InventoryEvents.openedEnderInvs.put(((Player) sender).getName(), playerName);
+						InventoryEvents.openedEnderInvs.put(((Player) sender).getUniqueId(), cachedPlayer.getUuid());
 					}
 
 				});

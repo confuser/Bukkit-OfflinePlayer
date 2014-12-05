@@ -7,7 +7,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
-import net.minecraft.server.v1_7_R1.EntityHuman;
 import net.minecraft.util.org.apache.commons.lang3.Validate;
 
 import org.bukkit.Bukkit;
@@ -16,6 +15,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 import com.comphenix.attribute.NbtFactory;
@@ -25,55 +25,55 @@ import com.comphenix.attribute.NbtFactory.StreamOptions;
 import com.google.common.io.Files;
 
 public class OfflinePlayerFile {
-	private String playerName;
+	private UUID uuid;
 	private NbtCompound nbt = null;
 	private File file;
 	private File folder;
 	private boolean autoSave = true;
 
-	public OfflinePlayerFile(CommandSender sender, String playerName) {
-		this.playerName = playerName;
+	public OfflinePlayerFile(CommandSender sender, UUID uuid) {
+		this.uuid = uuid;
 		this.folder = OfflinePlayerPlugin.playerWorldFolder;
 
 		try {
 			load();
 		} catch (FileNotFoundException e) {
-			sender.sendMessage(ChatColor.RED + playerName + " does not exist. Are you sure you got the case right?");
+			sender.sendMessage(ChatColor.RED + uuid.toString() + " could not be found");
 			return;
 		} catch (IOException e) {
-			sender.sendMessage(ChatColor.RED + "Unable to write to " + playerName + ".dat please check server file permissions are correct.");
+			sender.sendMessage(ChatColor.RED + "Unable to write to " + uuid.toString() + ".dat please check server file permissions are correct.");
 			return;
 		}
 	}
 
-	public OfflinePlayerFile(CommandSender sender, String playerName, boolean autoSave) {
-		this(sender, playerName);
+	public OfflinePlayerFile(CommandSender sender, UUID uuid, boolean autoSave) {
+		this(sender, uuid);
 		this.autoSave = autoSave;
 	}
 
-	public OfflinePlayerFile(String playerName) throws IOException, FileNotFoundException {
-		this(playerName, OfflinePlayerPlugin.playerWorldFolder);
+	public OfflinePlayerFile(UUID uuid) throws IOException, FileNotFoundException {
+		this(uuid, OfflinePlayerPlugin.playerWorldFolder);
 	}
 
-	public OfflinePlayerFile(String playerName, boolean autoSave) throws IOException, FileNotFoundException {
-		this(playerName, OfflinePlayerPlugin.playerWorldFolder);
+	public OfflinePlayerFile(UUID uuid, boolean autoSave) throws IOException, FileNotFoundException {
+		this(uuid, OfflinePlayerPlugin.playerWorldFolder);
 		this.autoSave = autoSave;
 	}
 
-	public OfflinePlayerFile(String playerName, File folder) throws IOException, FileNotFoundException {
-		this.playerName = playerName;
+	public OfflinePlayerFile(UUID uuid, File folder) throws IOException, FileNotFoundException {
+		this.uuid = uuid;
 		this.folder = folder;
 
 		load();
 	}
 
-	public OfflinePlayerFile(String playerName, File folder, boolean autoSave) throws IOException, FileNotFoundException {
-		this(playerName, folder);
+	public OfflinePlayerFile(UUID uuid, File folder, boolean autoSave) throws IOException, FileNotFoundException {
+		this(uuid, folder);
 		this.autoSave = autoSave;
 	}
 
 	private void load() throws IOException, FileNotFoundException {
-		file = new File(folder, playerName + ".dat");
+		file = new File(folder, uuid.toString() + ".dat");
 
 		if (!file.exists())
 			throw new FileNotFoundException();
@@ -178,12 +178,17 @@ public class OfflinePlayerFile {
 			save();
 	}
 
-	private Inventory getInventory(String path) {
+	private Inventory getInventory(Player holder, String path) {
 		Class<?> inventoryClass = Util.getCraftClass("PlayerInventory");
+		Class<?> entityHumanClass = Util.getCraftClass("EntityHuman");
+		Class<?> craftPlayerClass = Util.getCraftBukkitClass("entity.CraftPlayer");
 		Object inventory = null;
 
 		try {
-			inventory = inventoryClass.getConstructor(EntityHuman.class).newInstance((EntityHuman) null);
+			Method getHandle = craftPlayerClass.getDeclaredMethod("getHandle", new Class<?>[]{});
+			Object craftPlayer = getHandle.invoke(craftPlayerClass.cast(holder), new Object[]{});
+
+			inventory = inventoryClass.getConstructor(entityHumanClass).newInstance(entityHumanClass.cast(craftPlayer));
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 		}
@@ -206,8 +211,8 @@ public class OfflinePlayerFile {
 		return playerInv;
 	}
 
-	public Inventory getInventory() {
-		return getInventory("Inventory");
+	public Inventory getInventory(Player holder) {
+		return getInventory(holder, "Inventory");
 	}
 
 	public void setInventory(Inventory inventory) {
@@ -243,8 +248,8 @@ public class OfflinePlayerFile {
 			save();
 	}
 
-	public Inventory getEnderChest() {
-		return getInventory("EnderItems");
+	public Inventory getEnderChest(Player holder) {
+		return getInventory(holder, "EnderItems");
 	}
 
 	public void setEnderChest(Inventory inventory) {

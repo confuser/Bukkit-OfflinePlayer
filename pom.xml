@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.confuser</groupId>
 	<artifactId>OfflinePlayer</artifactId>
-	<version>2.0</version>
+	<version>3.0</version>
 	<repositories>
 		<repository>
 			<id>bukkit-repo</id>
@@ -73,16 +73,16 @@
 		</plugins>
 	</build>
 	<dependencies>
-		<dependency> <!-- Bukkit implementation -->
+		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
-			<version>LATEST</version>
+			<version>1.7.10-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency> <!-- NMS blocks -->
+		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
-			<version>LATEST</version>
+			<version>1.7.10-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -101,6 +101,12 @@
 			<artifactId>metrics-lite</artifactId>
 			<version>R6</version>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.frostcast</groupId>
+			<artifactId>PlayerIdAPI</artifactId>
+			<version>1.0.0</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

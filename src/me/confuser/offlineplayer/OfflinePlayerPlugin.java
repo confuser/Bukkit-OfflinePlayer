@@ -16,7 +16,7 @@ public class OfflinePlayerPlugin extends JavaPlugin {
 
 	public void onEnable() {
 		statPlugin = this;
-		playerWorldFolder = new File(Bukkit.getWorlds().get(0).getWorldFolder(), "players");
+		playerWorldFolder = new File(Bukkit.getWorlds().get(0).getWorldFolder(), "playerdata");
 
 		getConfig().options().copyDefaults(true);
 		saveConfig();

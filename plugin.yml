@@ -3,6 +3,7 @@ name: OfflinePlayer
 version: ${project.version}
 website: http://www.frostcast.net
 authors: [confuserr]
+depend: [PlayerIdAPI]
 softdepend: [Essentials]
 commands:
   offline:

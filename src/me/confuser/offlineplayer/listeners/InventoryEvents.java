@@ -1,6 +1,7 @@
 package me.confuser.offlineplayer.listeners;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import me.confuser.offlineplayer.OfflinePlayerFile;
 import org.bukkit.Bukkit;
@@ -13,8 +14,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 
 public class InventoryEvents implements Listener {
-	public static HashMap<String, String> openedInvs = new HashMap<String, String>();
-	public static HashMap<String, String> openedEnderInvs = new HashMap<String, String>();
+	public static HashMap<UUID, UUID> openedInvs = new HashMap<>();
+	public static HashMap<UUID, UUID> openedEnderInvs = new HashMap<>();
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void serverTransfer(ServerCommandEvent event) {
@@ -28,26 +29,26 @@ public class InventoryEvents implements Listener {
 
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event) {
-		String playerName = event.getPlayer().getName();
+		UUID uuid = event.getPlayer().getUniqueId();
 		boolean isPlayerInv = false;
 		boolean isEnderInv = false;
 
-		if (openedInvs.get(playerName) != null)
+		if (openedInvs.get(uuid) != null)
 			isPlayerInv = true;
-		else if (openedEnderInvs.get(playerName) != null)
+		else if (openedEnderInvs.get(uuid) != null)
 			isEnderInv = true;
 
 		if (!isPlayerInv && !isEnderInv)
 			return;
 
-		String playerInvName = null;
+		UUID playerInvUUID = null;
 
 		if (isPlayerInv)
-			playerInvName = openedInvs.remove(playerName);
+			playerInvUUID = openedInvs.remove(uuid);
 		else if (isEnderInv)
-			playerInvName = openedEnderInvs.remove(playerName);
+			playerInvUUID = openedEnderInvs.remove(uuid);
 
-		OfflinePlayerFile player = new OfflinePlayerFile((CommandSender) event.getPlayer(), playerInvName);
+		OfflinePlayerFile player = new OfflinePlayerFile((CommandSender) event.getPlayer(), playerInvUUID);
 
 		if (isPlayerInv)
 			player.setInventory(event.getInventory());
